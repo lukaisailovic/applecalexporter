@@ -20,8 +20,10 @@ export function formatMarkdown(events: CalendarEvent[]): string {
         lines.push(`  - Location: ${event.location}`)
       }
       if (event.description) {
-        const desc = event.description.trim().replace(/\n/g, ' ')
-        lines.push(`  - Notes: ${desc}`)
+        const desc = cleanDescription(event.description)
+        if (desc) {
+          lines.push(`  - Notes: ${desc}`)
+        }
       }
       if (event.url) {
         lines.push(`  - URL: ${event.url}`)
@@ -45,9 +47,10 @@ function groupByDate(events: CalendarEvent[]): Map<string, CalendarEvent[]> {
 
   for (const event of events) {
     const dateKey = formatDateHeader(event.start)
-    const existing = grouped.get(dateKey) || []
-    existing.push(event)
-    grouped.set(dateKey, existing)
+    if (!grouped.has(dateKey)) {
+      grouped.set(dateKey, [])
+    }
+    grouped.get(dateKey)!.push(event)
   }
 
   return grouped
@@ -78,4 +81,19 @@ function formatTime(date: Date): string {
     minute: '2-digit',
     hour12: true,
   })
+}
+
+function cleanDescription(desc: string): string {
+  let cleaned = desc
+  // Remove Google Meet boilerplate block (between markers)
+  cleaned = cleaned.replace(/-::~:~::[\s\S]*?::~:~::-/g, '')
+  // Remove Google Meet join info that might be outside markers
+  cleaned = cleaned.replace(/Join with Google Meet:[\s\S]*?Please do not edit this section\./gi, '')
+  // Remove standalone meet links and dial info
+  cleaned = cleaned.replace(/https:\/\/meet\.google\.com\/\S+/g, '')
+  cleaned = cleaned.replace(/Or dial:.*?#/g, '')
+  cleaned = cleaned.replace(/More phone numbers:.*$/gm, '')
+  cleaned = cleaned.replace(/Learn more about Meet at:.*$/gm, '')
+  // Collapse whitespace and newlines
+  return cleaned.replace(/\s+/g, ' ').trim()
 }

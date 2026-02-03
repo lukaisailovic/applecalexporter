@@ -155,8 +155,8 @@ function parseEventLine(line: string): CalendarEvent | null {
   return {
     uid: uid || crypto.randomUUID(),
     title: title || '(No Title)',
-    start: parseAppleScriptDate(startStr!),
-    end: parseAppleScriptDate(endStr!),
+    start: parseAppleScriptDate(startStr ?? ''),
+    end: parseAppleScriptDate(endStr ?? ''),
     allDay: allDayStr === 'true',
     location: location || undefined,
     description: description || undefined,
