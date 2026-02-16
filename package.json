@@ -8,7 +8,11 @@
     "url": "https://github.com/lukaisailovic/applecalexporter.git"
   },
   "keywords": [
-    "apple", "calendar", "export", "json", "markdown"
+    "apple",
+    "calendar",
+    "export",
+    "json",
+    "markdown"
   ],
   "version": "0.0.1",
   "module": "src/index.ts",
@@ -24,6 +28,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "citty": "^0.2.0"
+    "citty": "^0.2.0",
+    "rrule": "^2.8.1"
   }
 }
