@@ -8,6 +8,5 @@ export interface CalendarEvent {
   description?: string
   url?: string
   attendees?: string[]
-  recurrence?: string
   status?: 'confirmed' | 'tentative' | 'cancelled'
 }

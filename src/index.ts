@@ -1,10 +1,8 @@
 #!/usr/bin/env bun
 import { defineCommand, runMain } from 'citty'
-import { RRule, rrulestr } from 'rrule'
 import { listCalendars, fetchEvents } from './calendar'
 import { formatJSON } from './formatters/json'
 import { formatMarkdown } from './formatters/markdown'
-import type { CalendarEvent } from './types'
 
 const main = defineCommand({
   meta: {
@@ -77,8 +75,7 @@ const main = defineCommand({
     endDate.setDate(endDate.getDate() + days)
 
     const events = await fetchEvents(args.calendar, startDate, endDate)
-    const expanded = expandRecurringEvents(events, startDate, endDate)
-    const deduplicated = deduplicateEvents(expanded)
+    const deduplicated = deduplicateEvents(events)
 
     const output = args.output === 'md' ? formatMarkdown(deduplicated) : formatJSON(deduplicated)
 
@@ -90,43 +87,6 @@ const main = defineCommand({
     }
   },
 })
-
-function expandRecurringEvents(
-  events: CalendarEvent[],
-  rangeStart: Date,
-  rangeEnd: Date
-): CalendarEvent[] {
-  const result: CalendarEvent[] = []
-
-  for (const event of events) {
-    if (!event.recurrence) {
-      if (event.start >= rangeStart && event.start < rangeEnd) {
-        result.push(event)
-      }
-      continue
-    }
-
-    const duration = event.end.getTime() - event.start.getTime()
-    const rule = rrulestr(`DTSTART:${toRRuleDateStr(event.start)}\nRRULE:${event.recurrence}`)
-    const occurrences = rule.between(rangeStart, rangeEnd, true)
-
-    for (const occurrence of occurrences) {
-      if (occurrence >= rangeEnd) continue
-      result.push({
-        ...event,
-        start: occurrence,
-        end: new Date(occurrence.getTime() + duration),
-      })
-    }
-  }
-
-  return result
-}
-
-function toRRuleDateStr(date: Date): string {
-  const pad = (n: number) => n.toString().padStart(2, '0')
-  return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}T${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
-}
 
 function deduplicateEvents<T extends { uid: string; start: Date }>(events: T[]): T[] {
   const seen = new Set<string>()

@@ -28,7 +28,6 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "citty": "^0.2.0",
-    "rrule": "^2.8.1"
+    "citty": "^0.2.0"
   }
 }
