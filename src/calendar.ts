@@ -4,7 +4,7 @@ import { tmpdir } from 'os'
 import { join, dirname } from 'path'
 
 const HELPER_VERSION = 1
-const HELPER_BINARY = join(tmpdir(), `applecalexporter-helper-v${HELPER_VERSION}`)
+const HELPER_BINARY = join(dirname(import.meta.dir), 'dist', `calendar-helper-v${HELPER_VERSION}`)
 const SWIFT_SOURCE = join(dirname(import.meta.dir), 'src', 'calendar-helper.swift')
 
 async function ensureHelper(): Promise<string> {
